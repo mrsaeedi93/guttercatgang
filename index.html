@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mint NFT</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers/dist/ethers.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Mint Your NFT</h1>
+
+  <div id="wallet-status">
+    <button id="connectButton">Connect Wallet</button>
+  </div>
+
+  <div id="mint-section" style="display:none;">
+    <button id="mintButton">Mint NFT</button>
+  </div>
+
+  <script>
+    let provider;
+    let signer;
+    let contract;
+
+    const contractAddress = "YOUR_SMART_CONTRACT_ADDRESS"; // Replace with your NFT contract address
+    const contractABI = [
+      // Replace with your NFT contract's ABI
+      // Example minimal ABI for ERC-721 mint function
+      "function mint(address to) public"
+    ];
+
+    // Check if MetaMask is installed
+    if (typeof window.ethereum !== 'undefined') {
+      console.log('MetaMask is installed!');
+    } else {
+      alert('Please install MetaMask or another Web3 wallet.');
+    }
+
+    // Connect to MetaMask wallet
+    async function connectWallet() {
+      try {
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        signer = provider.getSigner();
+        document.getElementById("wallet-status").innerHTML = "Wallet Connected!";
+        document.getElementById("mint-section").style.display = "block";
+      } catch (error) {
+        console.error("Error connecting wallet:", error);
+      }
+    }
+
+    // Mint the NFT
+    async function mintNFT() {
+      try {
+        contract = new ethers.Contract(contractAddress, contractABI, signer);
+        const address = await signer.getAddress();
+        const tx = await contract.mint(address);
+        await tx.wait(); // Wait for the transaction to be mined
+        alert("NFT Minted Successfully!");
+      } catch (error) {
+        console.error("Error minting NFT:", error);
+      }
+    }
+
+    document.getElementById("connectButton").onclick = connectWallet;
+    document.getElementById("mintButton").onclick = mintNFT;
+  </script>
+</body>
+</html>
