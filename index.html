@@ -4,58 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Based Gutter Cats NFT Mint</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background: linear-gradient(135deg, #f5af19, #f12711);
-            color: white;
-        }
-
-        h1 {
-            font-size: 3rem;
-        }
-
-        input[type="number"] {
-            padding: 10px;
-            font-size: 1rem;
-            margin: 10px;
-            width: 50px;
-            text-align: center;
-        }
-
-        button {
-            padding: 10px 20px;
-            font-size: 1.2rem;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-
-        #status {
-            margin-top: 20px;
-            font-size: 1.1rem;
-        }
-    </style>
-</head>
-<body>
-    <h1>*Based Gutter Cats*</h1>
-    <p>Mint your NFT on the Base Sepolia Testnet</p>
-    <label for="mintAmount">Choose amount to mint (Max 10):</label>
-    <input type="number" id="mintAmount" min="1" max="10" value="1">
-    <button id="mintButton">Mint NFT</button>
-
-    <div id="status"></div>
 
     <!-- Include Ethers.js library -->
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.5.3/dist/ethers.min.js"></script>
@@ -118,5 +66,60 @@
             }
         };
     </script>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #f5af19, #f12711);
+            color: white;
+        }
+
+        h1 {
+            font-size: 3rem;
+        }
+
+        input[type="number"] {
+            padding: 10px;
+            font-size: 1rem;
+            margin: 10px;
+            width: 50px;
+            text-align: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #status {
+            margin-top: 20px;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>#Based Gutter Cats</h1>
+    <p>Mint your NFT on the Base Sepolia Testnet</p>
+    <label for="mintAmount">Choose amount to mint (Max 10):</label>
+    <input type="number" id="mintAmount" min="1" max="10" value="1">
+    <button id="mintButton">Mint NFT</button>
+
+    <div id="status"></div>
+
+
 </body>
 </html>
