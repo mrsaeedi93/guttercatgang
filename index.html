@@ -93,7 +93,7 @@
 
         async function mintNFT() {
             const mintAmount = document.getElementById("mintAmount").value;
-
+            const pricePerNFT = 500000000000000;
             if (mintAmount < 1 || mintAmount > 10) {
                 document.getElementById("status").innerText = "Please select a valid amount (1-10).";
                 return;
@@ -104,7 +104,9 @@
                 if (!signer) return;
                 const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
-                const tx = await contract.mint(mintAmount, 500000000000000); // Assuming your contract has a mintNFTs function
+                const totalPrice = pricePerNFT * mintAmount; // Total price in wei
+
+                const tx = await contract.mint(mintAmount, { value: totalPrice }); // Include value in transaction
                 document.getElementById("status").innerText = "Minting in progress...";
 
                 const receipt = await tx.wait();
