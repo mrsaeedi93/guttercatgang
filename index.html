@@ -104,7 +104,7 @@
                 if (!signer) return;
                 const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
-                const tx = await contract.mint(mintAmount); // Assuming your contract has a mintNFTs function
+                const tx = await contract.mint(mintAmount, 500000000000000); // Assuming your contract has a mintNFTs function
                 document.getElementById("status").innerText = "Minting in progress...";
 
                 const receipt = await tx.wait();
