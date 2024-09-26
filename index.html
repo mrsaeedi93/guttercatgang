@@ -98,7 +98,7 @@
                 const signer = await connectToMetaMask();
                 const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
-                const tx = await contract.mintNFTs(mintAmount); // Assuming your contract has a mintNFTs function
+                const tx = await contract.mint(mintAmount); // Assuming your contract has a mintNFTs function
                 document.getElementById("status").innerText = "Minting in progress...";
 
                 const receipt = await tx.wait();
