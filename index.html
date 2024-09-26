@@ -1,81 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mint NFT</title>
-  <script src="https://cdn.jsdelivr.net/npm/ethers/dist/ethers.min.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 50px;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      margin-top: 20px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Based Gutter Cats NFT Mint</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #f5af19, #f12711);
+            color: white;
+        }
+
+        h1 {
+            font-size: 3rem;
+        }
+
+        input[type="number"] {
+            padding: 10px;
+            font-size: 1rem;
+            margin: 10px;
+            width: 50px;
+            text-align: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #status {
+            margin-top: 20px;
+            font-size: 1.1rem;
+        }
+    </style>
 </head>
 <body>
-  <h1>Mint Your NFT</h1>
-
-  <div id="wallet-status">
-    <button id="connectButton">Connect Wallet</button>
-  </div>
-
-  <div id="mint-section" style="display:none;">
+    <h1>Based Gutter Cats</h1>
+    <p>Mint your NFT on the Base Sepolia Testnet</p>
+    <label for="mintAmount">Choose amount to mint (Max 10):</label>
+    <input type="number" id="mintAmount" min="1" max="10" value="1">
     <button id="mintButton">Mint NFT</button>
-  </div>
 
-  <script>
-    let provider;
-    let signer;
-    let contract;
+    <div id="status"></div>
 
-    const contractAddress = "YOUR_SMART_CONTRACT_ADDRESS"; // Replace with your NFT contract address
-    const contractABI = [
-      // Replace with your NFT contract's ABI
-      // Example minimal ABI for ERC-721 mint function
-      "function mint(address to) public"
-    ];
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.5.3/dist/ethers.min.js"></script>
+    <script>
+        const contractAddress = "YOUR_CONTRACT_ADDRESS";  // Replace with your contract address
+        const contractABI = YOUR_CONTRACT_ABI; // Replace with your contract ABI JSON
 
-    // Check if MetaMask is installed
-    if (typeof window.ethereum !== 'undefined') {
-      console.log('MetaMask is installed!');
-    } else {
-      alert('Please install MetaMask or another Web3 wallet.');
-    }
+        async function connectToMetaMask() {
+            try {
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                const signer = provider.getSigner();
+                return signer;
+            } catch (err) {
+                console.error("User denied account access or other issue:", err);
+            }
+        }
 
-    // Connect to MetaMask wallet
-    async function connectWallet() {
-      try {
-        await window.ethereum.request({ method: 'eth_requestAccounts' });
-        provider = new ethers.providers.Web3Provider(window.ethereum);
-        signer = provider.getSigner();
-        document.getElementById("wallet-status").innerHTML = "Wallet Connected!";
-        document.getElementById("mint-section").style.display = "block";
-      } catch (error) {
-        console.error("Error connecting wallet:", error);
-      }
-    }
+        async function mintNFT() {
+            const mintAmount = document.getElementById("mintAmount").value;
 
-    // Mint the NFT
-    async function mintNFT() {
-      try {
-        contract = new ethers.Contract(contractAddress, contractABI, signer);
-        const address = await signer.getAddress();
-        const tx = await contract.mint(address);
-        await tx.wait(); // Wait for the transaction to be mined
-        alert("NFT Minted Successfully!");
-      } catch (error) {
-        console.error("Error minting NFT:", error);
-      }
-    }
+            if (mintAmount < 1 || mintAmount > 10) {
+                document.getElementById("status").innerText = "Please select a valid amount (1-10).";
+                return;
+            }
 
-    document.getElementById("connectButton").onclick = connectWallet;
-    document.getElementById("mintButton").onclick = mintNFT;
-  </script>
+            try {
+                const signer = await connectToMetaMask();
+                const contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+                const tx = await contract.mintNFTs(mintAmount);  // Assuming your contract has a mintNFTs function
+                document.getElementById("status").innerText = "Minting in progress...";
+
+                const receipt = await tx.wait();
+                document.getElementById("status").innerText = `Successfully minted ${mintAmount} NFTs! TxHash: ${receipt.transactionHash}`;
+            } catch (error) {
+                console.error("Minting failed:", error);
+                document.getElementById("status").innerText = "Minting failed. Please try again.";
+            }
+        }
+
+        document.getElementById("mintButton").addEventListener("click", mintNFT);
+    </script>
 </body>
 </html>
