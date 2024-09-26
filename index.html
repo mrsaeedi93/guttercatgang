@@ -59,8 +59,16 @@
 
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.5.3/dist/ethers.min.js"></script>
     <script>
-        const contractAddress = "YOUR_CONTRACT_ADDRESS";  // Replace with your contract address
-        const contractABI = YOUR_CONTRACT_ABI; // Replace with your contract ABI JSON
+        const contractAddress = "0xa5d7cf34706795c50784A09CbEc91619AC42e726"; // Replace with your contract address
+        let contractABI;
+
+        async function loadABI() {
+            const response = await fetch('ABI.json'); // Path to your ABI file
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return await response.json();
+        }
 
         async function connectToMetaMask() {
             try {
@@ -85,7 +93,7 @@
                 const signer = await connectToMetaMask();
                 const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
-                const tx = await contract.mintNFTs(mintAmount);  // Assuming your contract has a mintNFTs function
+                const tx = await contract.mintNFTs(mintAmount); // Assuming your contract has a mintNFTs function
                 document.getElementById("status").innerText = "Minting in progress...";
 
                 const receipt = await tx.wait();
@@ -97,6 +105,16 @@
         }
 
         document.getElementById("mintButton").addEventListener("click", mintNFT);
+
+        // Load the ABI and initialize the contract on page load
+        window.onload = async () => {
+            try {
+                contractABI = await loadABI();
+            } catch (error) {
+                console.error("Failed to load ABI:", error);
+                document.getElementById("status").innerText = "Failed to load ABI.";
+            }
+        };
     </script>
 </body>
 </html>
