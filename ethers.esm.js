@@ -24269,5 +24269,5 @@ try {
 }
 catch (error) { }
 
-module.exports { BaseContract, BigNumber, Contract, ContractFactory, FixedNumber, Signer, VoidSigner, Wallet, Wordlist, index$1 as constants, ErrorCode as errors, ethers, getDefaultProvider, logger$J as logger, index$3 as providers, utils$1 as utils, version$p as version, wordlists };
+module.exports = { BaseContract, BigNumber, Contract, ContractFactory, FixedNumber, Signer, VoidSigner, Wallet, Wordlist, index$1 as constants, ErrorCode as errors, ethers, getDefaultProvider, logger$J as logger, index$3 as providers, utils$1 as utils, version$p as version, wordlists };
 //# sourceMappingURL=ethers.esm.js.map
