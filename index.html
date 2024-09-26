@@ -80,6 +80,11 @@
                 const provider = new ethers.providers.Web3Provider(window.ethereum);
                 await provider.send("eth_requestAccounts", []);
                 const signer = provider.getSigner();
+                const network = await provider.getNetwork();
+                if (network.chainId !== 84532) { // Replace with Base Sepolia chain ID
+                    alert("Please connect to the Base Sepolia Testnet!");
+                    return;
+        }
                 return signer;
             } catch (err) {
                 console.error("User denied account access or other issue:", err);
@@ -96,6 +101,7 @@
 
             try {
                 const signer = await connectToMetaMask();
+                if (!signer) return;
                 const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
                 const tx = await contract.mint(mintAmount); // Assuming your contract has a mintNFTs function
