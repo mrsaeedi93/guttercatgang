@@ -3,122 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Based Gutter Cats NFT Mint</title>
-
-    <!-- Include Ethers.js library -->
-    <script src="ethers.esm.js" type="module"></script>
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background: linear-gradient(135deg, #f5af19, #f12711);
-            color: white;
-        }
-
-        h1 {
-            font-size: 3rem;
-        }
-
-        input[type="number"] {
-            padding: 10px;
-            font-size: 1rem;
-            margin: 10px;
-            width: 50px;
-            text-align: center;
-        }
-
-        button {
-            padding: 10px 20px;
-            font-size: 1.2rem;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-
-        #status {
-            margin-top: 20px;
-            font-size: 1.1rem;
-        }
-    </style>
+    <title>Test Ethers</title>
 </head>
 <body>
-    <h1>_-Based Gutter Cats-_</h1>
-    <p>Mint your NFT on the Base Sepolia Testnet</p>
-    <label for="mintAmount">Choose amount to mint (Max 10):</label>
-    <input type="number" id="mintAmount" min="1" max="10" value="1">
-    <button id="mintButton">Mint NFT</button>
-
-    <div id="status"></div>
+    <h1>Ethers.js Test</h1>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@latest/dist/ethers.min.js"></script>
     <script>
-        const contractAddress = "0xa5d7cf34706795c50784A09CbEc91619AC42e726"; // Replace with your contract address
-        let contractABI;
-
-        async function loadABI() {
-            const response = await fetch('ABI.json'); // Path to your ABI file
-            if (!response.ok) {
-                throw new Error('Network response was not ok ' + response.statusText);
-            }
-            return await response.json();
-        }
-
-        async function connectToMetaMask() {
-            try {
-                const provider = new ethers.providers.Web3Provider(window.ethereum);
-                await provider.send("eth_requestAccounts", []);
-                const signer = provider.getSigner();
-                return signer;
-            } catch (err) {
-                console.error("User denied account access or other issue:", err);
-            }
-        }
-
-        async function mintNFT() {
-            const mintAmount = document.getElementById("mintAmount").value;
-
-            if (mintAmount < 1 || mintAmount > 10) {
-                document.getElementById("status").innerText = "Please select a valid amount (1-10).";
-                return;
-            }
-
-            try {
-                const signer = await connectToMetaMask();
-                const contract = new ethers.Contract(contractAddress, contractABI, signer);
-
-                const tx = await contract.mintNFTs(mintAmount); // Assuming your contract has a mintNFTs function
-                document.getElementById("status").innerText = "Minting in progress...";
-
-                const receipt = await tx.wait();
-                document.getElementById("status").innerText = `Successfully minted ${mintAmount} NFTs! TxHash: ${receipt.transactionHash}`;
-            } catch (error) {
-                console.error("Minting failed:", error);
-                document.getElementById("status").innerText = "Minting failed. Please try again.";
-            }
-        }
-
-        document.getElementById("mintButton").addEventListener("click", mintNFT);
-
-        // Load the ABI and initialize the contract on page load
-        window.onload = async () => {
-            try {
-                contractABI = await loadABI();
-            } catch (error) {
-                console.error("Failed to load ABI:", error);
-                document.getElementById("status").innerText = "Failed to load ABI.";
-            }
-        };
+        console.log(ethers); // Check if ethers is defined
     </script>
-    
-
 </body>
 </html>
