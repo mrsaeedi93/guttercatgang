@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,7 +32,7 @@
         button {
             padding: 10px 20px;
             font-size: 1.2rem;
-            background-color: #4CAF50;
+            background-color: grey;
             color: white;
             border: none;
             cursor: pointer;
@@ -46,22 +47,69 @@
             margin-top: 20px;
             font-size: 1.1rem;
         }
+
+        #mintedCount {
+            margin-top: 10px;
+            font-size: 1.2rem;
+            color: #FFD700;
+        }
+
+        #burnButton:disabled {
+            background-color: grey;
+            cursor: not-allowed;
+        }
+
+        /* Modal styling */
+        #burnModal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            color: black;
+            z-index: 1000;
+        }
+
+        #burnModal input {
+            padding: 5px;
+            font-size: 1rem;
+            margin: 5px;
+        }
+
+        #burnModal button {
+            padding: 5px 10px;
+            margin: 5px;
+            font-size: 1rem;
+        }
     </style>
-    
-<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.js" type="application/javascript"></script>
-    
+
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.js" type="application/javascript"></script>
+
 </head>
+
 <body>
     <h1>Based Gutter Cats</h1>
     <p>Mint your NFT on the Base Sepolia Testnet</p>
     <label for="mintAmount">Choose amount to mint (Max 5):</label>
     <input type="number" id="mintAmount" min="1" max="5" value="1">
     <button id="mintButton">Mint NFT</button>
+    <button id="burnButton" disabled>Burn NFT for Refund</button>
 
+    <div id="mintedCount">Minted NFTs: 0</div>
     <div id="status"></div>
 
+    <!-- Modal for entering NFT ID -->
+    <div id="burnModal">
+        <label for="nftIdInput">Enter the NFT ID to burn:</label>
+        <input type="number" id="nftIdInput" min="1">
+        <button id="confirmBurnButton">Confirm</button>
+        <button onclick="document.getElementById('burnModal').style.display='none'">Cancel</button>
+    </div>
+
     <!-- Include Ethers.js library -->
-    
 
     <script>
         const contractAddress = "0x5afc6e2ccCFC7Ed3A45532DEfb3a422dA8194955"; // Replace with your contract address
@@ -84,19 +132,33 @@
                 if (network.chainId !== 84532) { // Replace with Base Sepolia chain ID
                     alert("Please connect to the Base Sepolia Testnet!");
                     return;
-        }
+                }
                 return signer;
             } catch (err) {
                 console.error("User denied account access or other issue:", err);
             }
         }
 
-        async function mintNFT() {
-            const mintAmount = document.getElementById("mintAmount").value;
+        async function getMintedCount() {
+            try {
+                const signer = await connectToMetaMask();
+                if (!signer) return;
+                const contract = new ethers.Contract(contractAddress, contractABI, signer);
+                const address = await signer.getAddress();
+                const mintedCount = await contract.balanceOf(address);
+                document.getElementById("mintedCount").innerText = `Minted NFTs: ${mintedCount}`;
+                return mintedCount;
+            } catch (error) {
+                console.error("Failed to get minted count:", error);
+            }
+        }
 
-            
-            if (mintAmount < 1 || mintAmount > 5) {
-                document.getElementById("status").innerText = "Please select a valid amount (1-5).";
+        async function mintNFT() {
+            const mintAmount = parseInt(document.getElementById("mintAmount").value);
+            const mintedCount = await getMintedCount();
+
+            if (mintAmount < 1 || mintAmount + mintedCount > 5) {
+                document.getElementById("status").innerText = "Invalid mint amount. Maximum of 5 NFTs per wallet.";
                 return;
             }
 
@@ -104,28 +166,87 @@
                 const signer = await connectToMetaMask();
                 if (!signer) return;
                 const contract = new ethers.Contract(contractAddress, contractABI, signer);
-                const totalPrice = contract.mintPrice(mintAmount);
+                const address = await signer.getAddress();
 
-                const tx = await contract.mint(mintAmount, { value: totalPrice }); // Include value in transaction
+                // Calculate mint price
+                //                let totalPrice;
+                //                if (mintedCount === 0) {
+                //                    totalPrice = await contract.mintPrice(Math.max(mintAmount - 1, 0)); // First NFT is free
+                //                } else {
+                //                    totalPrice = await contract.mintPrice(mintAmount);
+                //                }
+
+                let totalPrice;
+                totalPrice = await contract.mintPrice(mintAmount);
+
+                const tx = await contract.mint(mintAmount, { value: totalPrice });
                 document.getElementById("status").innerText = "Minting in progress...";
-
                 const receipt = await tx.wait();
                 document.getElementById("status").innerText = `Successfully minted ${mintAmount} NFTs! TxHash: ${receipt.transactionHash}`;
+
+                // Update minted count
+                await getMintedCount();
+                await checkBurnEligibility();
             } catch (error) {
                 console.error("Minting failed:", error);
                 document.getElementById("status").innerText = "Minting failed. Please try again.";
             }
         }
 
-        // Move this line to be after DOM elements are loaded
-        document.getElementById("mintButton").addEventListener("click", mintNFT);
+        async function burnNFT() {
+            const nftId = document.getElementById("nftIdInput").value;
+            if (!nftId) {
+                document.getElementById("status").innerText = "Please enter a valid NFT ID.";
+                return;
+            }
+            try {
+                const signer = await connectToMetaMask();
+                if (!signer) return;
+                const contract = new ethers.Contract(contractAddress, contractABI, signer);
+                const tx = await contract.burnForRefund(nftId); // Assuming burnForRefund(uint256 tokenId) is your function
+                document.getElementById("status").innerText = "Burning in progress...";
+                const receipt = await tx.wait();
+                document.getElementById("status").innerText = `Successfully burned NFT with ID ${nftId} for a refund! TxHash: ${receipt.transactionHash}`;
 
-        // Load the ABI and initialize the contract on page load
+                // Update minted count and recheck eligibility
+                await getMintedCount();
+                await checkBurnEligibility();
+            } catch (error) {
+                console.error("Burn failed:", error);
+                document.getElementById("status").innerText = "Burn failed. Please try again.";
+            }
+        }
+
+        async function checkBurnEligibility() {
+            const mintedCount = await getMintedCount();
+            const maxMintCount = await contract.maxMintPerWallet(); // Assuming maxMintPerWallet is a read function in the contract
+
+            if (mintedCount >= maxMintCount) {
+                document.getElementById("burnButton").disabled = false;
+                document.getElementById("burnButton").style.backgroundColor = "#4CAF50"; // Enable and style the burn button
+            } else {
+                document.getElementById("burnButton").disabled = true;
+                document.getElementById("burnButton").style.backgroundColor = "grey"; // Disable and style the burn button
+            }
+        }
+
+        // Show modal to prompt for NFT ID
+        document.getElementById("burnButton").addEventListener("click", () => {
+            document.getElementById("burnModal").style.display = 'block';
+        });
+
+        // Handle confirmation in the modal
+        document.getElementById("confirmBurnButton").addEventListener("click", () => {
+            document.getElementById("burnModal").style.display = 'none';
+            burnNFT(); // Call the burn function after confirming the NFT ID
+        });
+
+        // Check burn eligibility on page load
         window.onload = async () => {
             try {
                 contractABI = await loadABI();
-                // Add event listener here to ensure the DOM is loaded
-                document.getElementById("mintButton").addEventListener("click", mintNFT);
+                await getMintedCount();
+                await checkBurnEligibility(); // Check eligibility after loading the minted count
             } catch (error) {
                 console.error("Failed to load ABI:", error);
                 document.getElementById("status").innerText = "Failed to load ABI.";
@@ -133,4 +254,5 @@
         };
     </script>
 </body>
+
 </html>
