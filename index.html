@@ -155,9 +155,9 @@
 
         async function mintNFT() {
             const mintAmount = parseInt(document.getElementById("mintAmount").value);
-            const mintedCount = await getMintedCount();
+            const mintedCount = parseInt(await getMintedCount());
 
-            if (mintAmount <= 1 || mintAmount + mintedCount > 5) {
+            if (mintAmount < 1 || mintAmount + mintedCount > 5) {
                 document.getElementById("status").innerText = "Invalid mint amount. Maximum of 5 NFTs per wallet.";
                 return;
             }
