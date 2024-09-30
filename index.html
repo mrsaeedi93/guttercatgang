@@ -217,18 +217,27 @@
             }
         }
 
-        async function checkBurnEligibility() {
-            const mintedCount = await getMintedCount();
-            const maxMintCount = await contract.maxMintPerWallet(); // Assuming maxMintPerWallet is a read function in the contract
+async function checkBurnEligibility() {
+    try {
+        const signer = await connectToMetaMask();
+        if (!signer) return;
+        const contract = new ethers.Contract(contractAddress, contractABI, signer); // Define contract instance inside the function
+        
+        const mintedCount = await getMintedCount(); // Assuming this fetches the minted count of the wallet
+        const maxMintCount = await contract.maxMintPerWallet(); // Assuming this is a read function in the contract that returns the max mint per wallet
 
-            if (mintedCount >= maxMintCount) {
-                document.getElementById("burnButton").disabled = false;
-                document.getElementById("burnButton").style.backgroundColor = "#4CAF50"; // Enable and style the burn button
-            } else {
-                document.getElementById("burnButton").disabled = true;
-                document.getElementById("burnButton").style.backgroundColor = "grey"; // Disable and style the burn button
-            }
+        if (mintedCount >= maxMintCount) {
+            document.getElementById("burnButton").disabled = false;
+            document.getElementById("burnButton").style.backgroundColor = "#4CAF50"; // Enable and style the burn button
+        } else {
+            document.getElementById("burnButton").disabled = true;
+            document.getElementById("burnButton").style.backgroundColor = "grey"; // Disable and style the burn button
         }
+    } catch (error) {
+        console.error("Failed to check burn eligibility:", error);
+        document.getElementById("status").innerText = "Failed to check burn eligibility.";
+    }
+}
 
         // Show modal to prompt for NFT ID
         document.getElementById("burnButton").addEventListener("click", () => {
