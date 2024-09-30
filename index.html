@@ -7,7 +7,7 @@
     <title>Based Gutter Cats NFT Mint</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -15,32 +15,58 @@
             height: 100vh;
             background: linear-gradient(135deg, #f5af19, #f12711);
             color: white;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
         }
 
         h1 {
             font-size: 3rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
         }
 
         input[type="number"] {
             padding: 10px;
             font-size: 1rem;
             margin: 10px;
-            width: 50px;
+            width: 70px;
             text-align: center;
+            border: 2px solid #FFD700;
+            border-radius: 5px;
+            background-color: #282828;
+            color: white;
         }
 
         button {
             padding: 10px 20px;
             font-size: 1.2rem;
-            background-color: grey;
+            background-color: #4CAF50;
             color: white;
             border: none;
             cursor: pointer;
             border-radius: 5px;
+            margin: 10px; /* Added spacing between buttons */
+            transition: background-color 0.3s ease, transform 0.2s;
         }
 
         button:hover {
             background-color: #45a049;
+            transform: scale(1.05);
+        }
+
+        button:disabled {
+            background-color: grey;
+            cursor: not-allowed;
         }
 
         #status {
@@ -54,11 +80,6 @@
             color: #FFD700;
         }
 
-        #burnButton:disabled {
-            background-color: grey;
-            cursor: not-allowed;
-        }
-
         /* Modal styling */
         #burnModal {
             display: none;
@@ -66,23 +87,45 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background-color: white;
-            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 30px;
             border-radius: 10px;
             color: black;
             z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            width: 300px; /* Fixed width for the modal */
+        }
+
+        #burnModal label {
+            margin-bottom: 10px;
+            font-size: 1.1rem;
         }
 
         #burnModal input {
-            padding: 5px;
+            padding: 8px;
             font-size: 1rem;
-            margin: 5px;
+            margin: 10px 0;
+            width: calc(100% - 16px);
+            border: 2px solid #4CAF50;
+            border-radius: 5px;
+            background-color: #282828;
+            color: white;
         }
 
         #burnModal button {
-            padding: 5px 10px;
-            margin: 5px;
+            padding: 8px 15px;
+            margin: 10px 5px 0; /* Added margin to the confirm and cancel buttons */
             font-size: 1rem;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, transform 0.2s;
+        }
+
+        #burnModal button:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
         }
     </style>
 
@@ -108,8 +151,6 @@
         <button id="confirmBurnButton">Confirm</button>
         <button onclick="document.getElementById('burnModal').style.display='none'">Cancel</button>
     </div>
-
-    <!-- Include Ethers.js library -->
 
     <script>
         const contractAddress = "0x5afc6e2ccCFC7Ed3A45532DEfb3a422dA8194955"; // Replace with your contract address
@@ -169,14 +210,6 @@
                 const address = await signer.getAddress();
 
                 // Calculate mint price
-                //                let totalPrice;
-                //                if (mintedCount === 0) {
-                //                    totalPrice = await contract.mintPrice(Math.max(mintAmount - 1, 0)); // First NFT is free
-                //                } else {
-                //                    totalPrice = await contract.mintPrice(mintAmount);
-                //                }
-
-                // let totalPrice;
                 totalPrice = await contract.mintPrice(mintAmount);
 
                 const tx = await contract.mint(mintAmount, { value: totalPrice });
@@ -253,7 +286,6 @@
         // Check burn eligibility on page load
         window.onload = async () => {
             try {
-
                 document.getElementById("mintButton").addEventListener("click", mintNFT);
                 document.getElementById("burnButton").addEventListener("click", () => {
                     document.getElementById("burnModal").style.display = 'block';
