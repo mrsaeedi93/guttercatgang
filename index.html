@@ -176,7 +176,7 @@
                 //                    totalPrice = await contract.mintPrice(mintAmount);
                 //                }
 
-                let totalPrice;
+                // let totalPrice;
                 totalPrice = await contract.mintPrice(mintAmount);
 
                 const tx = await contract.mint(mintAmount, { value: totalPrice });
@@ -217,27 +217,27 @@
             }
         }
 
-async function checkBurnEligibility() {
-    try {
-        const signer = await connectToMetaMask();
-        if (!signer) return;
-        const contract = new ethers.Contract(contractAddress, contractABI, signer); // Define contract instance inside the function
-        
-        const mintedCount = await getMintedCount(); // Assuming this fetches the minted count of the wallet
-        const maxMintCount = await contract.maxMintPerWallet(); // Assuming this is a read function in the contract that returns the max mint per wallet
+        async function checkBurnEligibility() {
+            try {
+                const signer = await connectToMetaMask();
+                if (!signer) return;
+                const contract = new ethers.Contract(contractAddress, contractABI, signer); // Define contract instance inside the function
 
-        if (mintedCount >= maxMintCount) {
-            document.getElementById("burnButton").disabled = false;
-            document.getElementById("burnButton").style.backgroundColor = "#4CAF50"; // Enable and style the burn button
-        } else {
-            document.getElementById("burnButton").disabled = true;
-            document.getElementById("burnButton").style.backgroundColor = "grey"; // Disable and style the burn button
+                const mintedCount = await getMintedCount(); // Assuming this fetches the minted count of the wallet
+                const maxMintCount = await contract.maxMintPerWallet(); // Assuming this is a read function in the contract that returns the max mint per wallet
+
+                if (mintedCount >= maxMintCount) {
+                    document.getElementById("burnButton").disabled = false;
+                    document.getElementById("burnButton").style.backgroundColor = "#4CAF50"; // Enable and style the burn button
+                } else {
+                    document.getElementById("burnButton").disabled = true;
+                    document.getElementById("burnButton").style.backgroundColor = "grey"; // Disable and style the burn button
+                }
+            } catch (error) {
+                console.error("Failed to check burn eligibility:", error);
+                document.getElementById("status").innerText = "Failed to check burn eligibility.";
+            }
         }
-    } catch (error) {
-        console.error("Failed to check burn eligibility:", error);
-        document.getElementById("status").innerText = "Failed to check burn eligibility.";
-    }
-}
 
         // Show modal to prompt for NFT ID
         document.getElementById("burnButton").addEventListener("click", () => {
@@ -253,6 +253,13 @@ async function checkBurnEligibility() {
         // Check burn eligibility on page load
         window.onload = async () => {
             try {
+
+                document.getElementById("mintButton").addEventListener("click", mintNFT);
+                document.getElementById("burnButton").addEventListener("click", () => {
+                    document.getElementById("burnModal").style.display = 'block';
+                });
+                document.getElementById("confirmBurnButton").addEventListener("click", burnNFT);
+
                 contractABI = await loadABI();
                 await getMintedCount();
                 await checkBurnEligibility(); // Check eligibility after loading the minted count
