@@ -203,7 +203,7 @@
                 const signer = await connectToMetaMask();
                 if (!signer) return;
                 const contract = new ethers.Contract(contractAddress, contractABI, signer);
-                const tx = await contract.burnForRefund(nftId); // Assuming burnForRefund(uint256 tokenId) is your function
+                const tx = await contract.burnKitty(nftId); // Assuming burnForRefund(uint256 tokenId) is your function
                 document.getElementById("status").innerText = "Burning in progress...";
                 const receipt = await tx.wait();
                 document.getElementById("status").innerText = `Successfully burned NFT with ID ${nftId} for a refund! TxHash: ${receipt.transactionHash}`;
