@@ -48,7 +48,7 @@
             font-size: 1.1rem;
         }
 
-        #mintedCount {
+        #mintedCountLabel {
             margin-top: 10px;
             font-size: 1.2rem;
             color: #FFD700;
@@ -98,7 +98,7 @@
     <button id="mintButton">Mint NFT</button>
     <button id="burnButton" disabled>Burn NFT for Refund</button>
 
-    <div id="mintedCount">Minted NFTs: 0</div>
+    <div id="mintedCountLabel">Minted NFTs: 0</div>
     <div id="status"></div>
 
     <!-- Modal for entering NFT ID -->
@@ -146,7 +146,7 @@
                 const contract = new ethers.Contract(contractAddress, contractABI, signer);
                 const address = await signer.getAddress();
                 const mintedCount = await contract.balanceOf(address);
-                document.getElementById("mintedCount").innerText = `Minted NFTs: ${mintedCount}`;
+                document.getElementById("mintedCountLabel").innerText = `Minted NFTs: ${mintedCount}`;
                 return mintedCount;
             } catch (error) {
                 console.error("Failed to get minted count:", error);
