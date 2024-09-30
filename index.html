@@ -74,7 +74,7 @@
             }
 
             to {
-                transform: translateY(-2000px);
+                transform: translateY(2000px);
             }
         }
 
@@ -90,12 +90,9 @@
 
         body {
 
-            height: 100vh;
-
             color: white;
             margin: 0;
-            padding: 20px;
-            text-align: center;
+
         }
 
         h1 {
@@ -105,12 +102,12 @@
 
         p {
             font-size: 1.2rem;
-            margin-bottom: 20px;
+
         }
 
         label {
             font-size: 1.1rem;
-            margin-bottom: 10px;
+
         }
 
         input[type="number"] {
@@ -228,7 +225,6 @@
     </div>
 
 
-    <link href='https://fonts.googleapis.com/css?family=Lato:300,400,700' rel='stylesheet' type='text/css'>
     <div id='stars'></div>
     <div id='stars2'></div>
     <div id='stars3'></div>
@@ -250,155 +246,155 @@
 
 
 
-        <script>
-            const contractAddress = "0x5afc6e2ccCFC7Ed3A45532DEfb3a422dA8194955"; // Replace with your contract address
-            let contractABI;
+    <script>
+        const contractAddress = "0x5afc6e2ccCFC7Ed3A45532DEfb3a422dA8194955"; // Replace with your contract address
+        let contractABI;
 
-            async function loadABI() {
-                const response = await fetch('ABI.json'); // Ensure ABI.json is in the same directory as this HTML file
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                return await response.json();
+        async function loadABI() {
+            const response = await fetch('ABI.json'); // Ensure ABI.json is in the same directory as this HTML file
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
             }
+            return await response.json();
+        }
 
-            async function connectToMetaMask() {
-                try {
-                    const provider = new ethers.providers.Web3Provider(window.ethereum);
-                    await provider.send("eth_requestAccounts", []);
-                    const signer = provider.getSigner();
-                    const network = await provider.getNetwork();
-                    if (network.chainId !== 84532) { // Replace with Base Sepolia chain ID
-                        alert("Please connect to the Base Sepolia Testnet!");
-                        return;
-                    }
-                    return signer;
-                } catch (err) {
-                    console.error("User denied account access or other issue:", err);
-                }
-            }
-
-            async function getMintedCount() {
-                try {
-                    const signer = await connectToMetaMask();
-                    if (!signer) return;
-                    const contract = new ethers.Contract(contractAddress, contractABI, signer);
-                    const address = await signer.getAddress();
-                    const mintedCount = await contract.balanceOf(address);
-                    document.getElementById("mintedCountLabel").innerText = `Owned NFTs: ${mintedCount}`;
-                    return mintedCount;
-                } catch (error) {
-                    console.error("Failed to get minted count:", error);
-                }
-            }
-
-            async function mintNFT() {
-                const mintAmount = parseInt(document.getElementById("mintAmount").value);
-                const mintedCount = parseInt(await getMintedCount());
-
-                if (mintAmount < 1 || mintAmount + mintedCount > 5) {
-                    document.getElementById("status").innerText = "Invalid mint amount. Maximum of 5 NFTs per wallet.";
+        async function connectToMetaMask() {
+            try {
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                const signer = provider.getSigner();
+                const network = await provider.getNetwork();
+                if (network.chainId !== 84532) { // Replace with Base Sepolia chain ID
+                    alert("Please connect to the Base Sepolia Testnet!");
                     return;
                 }
+                return signer;
+            } catch (err) {
+                console.error("User denied account access or other issue:", err);
+            }
+        }
 
-                try {
-                    const signer = await connectToMetaMask();
-                    if (!signer) return;
-                    const contract = new ethers.Contract(contractAddress, contractABI, signer);
-                    const address = await signer.getAddress();
+        async function getMintedCount() {
+            try {
+                const signer = await connectToMetaMask();
+                if (!signer) return;
+                const contract = new ethers.Contract(contractAddress, contractABI, signer);
+                const address = await signer.getAddress();
+                const mintedCount = await contract.balanceOf(address);
+                document.getElementById("mintedCountLabel").innerText = `Owned NFTs: ${mintedCount}`;
+                return mintedCount;
+            } catch (error) {
+                console.error("Failed to get minted count:", error);
+            }
+        }
 
-                    // Calculate mint price
-                    totalPrice = await contract.mintPrice(mintAmount);
+        async function mintNFT() {
+            const mintAmount = parseInt(document.getElementById("mintAmount").value);
+            const mintedCount = parseInt(await getMintedCount());
 
-                    const tx = await contract.mint(mintAmount, { value: totalPrice });
-                    document.getElementById("status").innerText = "Minting in progress...";
-                    const receipt = await tx.wait();
-                    document.getElementById("status").innerText = `Successfully minted ${mintAmount} NFTs! TxHash: ${receipt.transactionHash}`;
-
-                    // Update minted count
-                    await getMintedCount();
-                    await checkBurnEligibility();
-                } catch (error) {
-                    console.error("Minting failed:", error);
-                    document.getElementById("status").innerText = "Minting failed. Please try again.";
-                }
+            if (mintAmount < 1 || mintAmount + mintedCount > 5) {
+                document.getElementById("status").innerText = "Invalid mint amount. Maximum of 5 NFTs per wallet.";
+                return;
             }
 
-            async function burnNFT() {
-                const nftId = document.getElementById("nftIdInput").value;
-                if (!nftId) {
-                    document.getElementById("status").innerText = "Please enter a valid NFT ID.";
-                    return;
-                }
-                try {
-                    const signer = await connectToMetaMask();
-                    if (!signer) return;
-                    const contract = new ethers.Contract(contractAddress, contractABI, signer);
-                    const tx = await contract.burnKitty(nftId); // Assuming burnForRefund(uint256 tokenId) is your function
-                    document.getElementById("status").innerText = "Burning in progress...";
-                    const receipt = await tx.wait();
-                    document.getElementById("status").innerText = `Successfully burned NFT with ID ${nftId} for a refund! TxHash: ${receipt.transactionHash}`;
+            try {
+                const signer = await connectToMetaMask();
+                if (!signer) return;
+                const contract = new ethers.Contract(contractAddress, contractABI, signer);
+                const address = await signer.getAddress();
 
-                    // Update minted count and recheck eligibility
-                    await getMintedCount();
-                    await checkBurnEligibility();
-                } catch (error) {
-                    console.error("Burn failed:", error);
-                    document.getElementById("status").innerText = "Burn failed. Please try again.";
-                }
+                // Calculate mint price
+                totalPrice = await contract.mintPrice(mintAmount);
+
+                const tx = await contract.mint(mintAmount, { value: totalPrice });
+                document.getElementById("status").innerText = "Minting in progress...";
+                const receipt = await tx.wait();
+                document.getElementById("status").innerText = `Successfully minted ${mintAmount} NFTs! TxHash: ${receipt.transactionHash}`;
+
+                // Update minted count
+                await getMintedCount();
+                await checkBurnEligibility();
+            } catch (error) {
+                console.error("Minting failed:", error);
+                document.getElementById("status").innerText = "Minting failed. Please try again.";
             }
+        }
 
-            async function checkBurnEligibility() {
-                try {
-                    const signer = await connectToMetaMask();
-                    if (!signer) return;
-                    const contract = new ethers.Contract(contractAddress, contractABI, signer); // Define contract instance inside the function
-
-                    const mintedCount = await getMintedCount(); // Assuming this fetches the minted count of the wallet
-                    const maxMintCount = await contract.maxMintPerWallet(); // Assuming this is a read function in the contract that returns the max mint per wallet
-
-                    if (mintedCount >= maxMintCount) {
-                        document.getElementById("burnButton").disabled = false;
-                        document.getElementById("burnButton").style.backgroundColor = "#4CAF50"; // Enable and style the burn button
-                    } else {
-                        document.getElementById("burnButton").disabled = true;
-                        document.getElementById("burnButton").style.backgroundColor = "grey"; // Disable and style the burn button
-                    }
-                } catch (error) {
-                    console.error("Failed to check burn eligibility:", error);
-                    document.getElementById("status").innerText = "Failed to check burn eligibility.";
-                }
+        async function burnNFT() {
+            const nftId = document.getElementById("nftIdInput").value;
+            if (!nftId) {
+                document.getElementById("status").innerText = "Please enter a valid NFT ID.";
+                return;
             }
+            try {
+                const signer = await connectToMetaMask();
+                if (!signer) return;
+                const contract = new ethers.Contract(contractAddress, contractABI, signer);
+                const tx = await contract.burnKitty(nftId); // Assuming burnForRefund(uint256 tokenId) is your function
+                document.getElementById("status").innerText = "Burning in progress...";
+                const receipt = await tx.wait();
+                document.getElementById("status").innerText = `Successfully burned NFT with ID ${nftId} for a refund! TxHash: ${receipt.transactionHash}`;
 
-            // Show modal to prompt for NFT ID
-            document.getElementById("burnButton").addEventListener("click", () => {
-                document.getElementById("burnModal").style.display = 'block';
-            });
+                // Update minted count and recheck eligibility
+                await getMintedCount();
+                await checkBurnEligibility();
+            } catch (error) {
+                console.error("Burn failed:", error);
+                document.getElementById("status").innerText = "Burn failed. Please try again.";
+            }
+        }
 
-            // Handle confirmation in the modal
-            document.getElementById("confirmBurnButton").addEventListener("click", () => {
-                document.getElementById("burnModal").style.display = 'none';
-                burnNFT(); // Call the burn function after confirming the NFT ID
-            });
+        async function checkBurnEligibility() {
+            try {
+                const signer = await connectToMetaMask();
+                if (!signer) return;
+                const contract = new ethers.Contract(contractAddress, contractABI, signer); // Define contract instance inside the function
 
-            // Check burn eligibility on page load
-            window.onload = async () => {
-                try {
-                    document.getElementById("mintButton").addEventListener("click", mintNFT);
-                    document.getElementById("burnButton").addEventListener("click", () => {
-                        document.getElementById("burnModal").style.display = 'block';
-                    });
-                    document.getElementById("confirmBurnButton").addEventListener("click", burnNFT);
+                const mintedCount = await getMintedCount(); // Assuming this fetches the minted count of the wallet
+                const maxMintCount = await contract.maxMintPerWallet(); // Assuming this is a read function in the contract that returns the max mint per wallet
 
-                    contractABI = await loadABI();
-                    await getMintedCount();
-                    await checkBurnEligibility(); // Check eligibility after loading the minted count
-                } catch (error) {
-                    console.error("Failed to load ABI:", error);
-                    document.getElementById("status").innerText = "Failed to load ABI.";
+                if (mintedCount >= maxMintCount) {
+                    document.getElementById("burnButton").disabled = false;
+                    document.getElementById("burnButton").style.backgroundColor = "#4CAF50"; // Enable and style the burn button
+                } else {
+                    document.getElementById("burnButton").disabled = true;
+                    document.getElementById("burnButton").style.backgroundColor = "grey"; // Disable and style the burn button
                 }
-            };
-        </script>
+            } catch (error) {
+                console.error("Failed to check burn eligibility:", error);
+                document.getElementById("status").innerText = "Failed to check burn eligibility.";
+            }
+        }
+
+        // Show modal to prompt for NFT ID
+        document.getElementById("burnButton").addEventListener("click", () => {
+            document.getElementById("burnModal").style.display = 'block';
+        });
+
+        // Handle confirmation in the modal
+        document.getElementById("confirmBurnButton").addEventListener("click", () => {
+            document.getElementById("burnModal").style.display = 'none';
+            burnNFT(); // Call the burn function after confirming the NFT ID
+        });
+
+        // Check burn eligibility on page load
+        window.onload = async () => {
+            try {
+                document.getElementById("mintButton").addEventListener("click", mintNFT);
+                document.getElementById("burnButton").addEventListener("click", () => {
+                    document.getElementById("burnModal").style.display = 'block';
+                });
+                document.getElementById("confirmBurnButton").addEventListener("click", burnNFT);
+
+                contractABI = await loadABI();
+                await getMintedCount();
+                await checkBurnEligibility(); // Check eligibility after loading the minted count
+            } catch (error) {
+                console.error("Failed to load ABI:", error);
+                document.getElementById("status").innerText = "Failed to load ABI.";
+            }
+        };
+    </script>
 
 </body>
 
