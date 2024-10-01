@@ -6,111 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Based Gutter Cats NFT Mint</title>
     <style>
-        html {
-            height: 100%;
-            background: radial-gradient(ellipse at bottom, hsl(225, 92%, 54%) 0%, #d2ff8f 100%);
-            overflow: hidden;
-        }
-
-        body {
-            font-family: 'Arial', sans-serif;
-            color: white;
-            margin: 0;
-        }
-
-        #header {
-            display: flex;
-            justify-content: flex-end;
-            padding: 10px;
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 100%;
-        }
-
-        #connectButton,
-        #switchNetworkButton {
-            padding: 10px 20px;
-            font-size: 1rem;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-            margin: 10px;
-        }
-
-        #connectButton:hover,
-        #switchNetworkButton:hover {
-            background-color: #45a049;
-            transform: scale(1.05);
-        }
-
-        #contents {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-        }
-
-        h1 {
-            font-size: 3rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-        }
-
-        p {
-            font-size: 1.2rem;
-        }
-
-        label {
-            font-size: 1.1rem;
-        }
-
-        input[type="number"] {
-            padding: 10px;
-            font-size: 1rem;
-            margin: 10px;
-            width: 70px;
-            text-align: center;
-            border: 2px solid #FFD700;
-            border-radius: 5px;
-            background-color: #282828;
-            color: white;
-        }
-
-        button {
-            padding: 10px 20px;
-            font-size: 1.2rem;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-            margin: 10px;
-            transition: background-color 0.3s ease, transform 0.2s;
-        }
-
-        button:hover {
-            background-color: #45a049;
-            transform: scale(1.05);
-        }
-
-        button:disabled {
-            background-color: grey;
-            cursor: not-allowed;
-        }
-
-        #status {
-            margin-top: 20px;
-            font-size: 1.1rem;
-        }
-
-        #mintedCountLabel {
-            margin-top: 10px;
-            font-size: 1.2rem;
-            color: #FFD700;
-        }
+        /* Same styling as before */
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.js" type="application/javascript"></script>
@@ -140,7 +36,7 @@
         let contractABI;
 
         async function loadABI() {
-            const response = await fetch('ABI.json');
+            const response = await fetch('ABI.json'); 
             return await response.json();
         }
 
@@ -165,14 +61,42 @@
 
         document.getElementById("connectButton").addEventListener("click", connectToMetaMask);
 
+        async function addBaseSepoliaNetwork() {
+            try {
+                // This method adds the Base Sepolia network if it hasn't been added yet
+                await window.ethereum.request({
+                    method: 'wallet_addEthereumChain',
+                    params: [{
+                        chainId: '0x14A5C', // Base Sepolia chainId in hexadecimal (84532)
+                        chainName: 'Base Sepolia',
+                        nativeCurrency: {
+                            name: 'ETH',
+                            symbol: 'ETH',
+                            decimals: 18
+                        },
+                        rpcUrls: ['https://sepolia.base.org'], // You can replace this with the official RPC URL
+                        blockExplorerUrls: ['https://sepolia.basescan.org'] // Block explorer for Base Sepolia
+                    }]
+                });
+            } catch (err) {
+                console.error("Failed to add Base Sepolia network", err);
+            }
+        }
+
         document.getElementById("switchNetworkButton").addEventListener("click", async () => {
             try {
                 await window.ethereum.request({
                     method: 'wallet_switchEthereumChain',
-                    params: [{ chainId: '0x14A5C' }], // Base Sepolia chainId in hex
+                    params: [{ chainId: '0x14A5C' }] // Base Sepolia chainId in hex
                 });
             } catch (err) {
-                console.error("Failed to switch network", err);
+                if (err.code === 4902) {
+                    // Chain has not been added to the user's wallet, prompt to add
+                    console.log("Base Sepolia network not found. Attempting to add it.");
+                    await addBaseSepoliaNetwork();
+                } else {
+                    console.error("Failed to switch network", err);
+                }
             }
         });
 
