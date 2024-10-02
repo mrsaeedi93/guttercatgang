@@ -134,7 +134,7 @@
         }
     </style>
 
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.js" type="application/javascript"></script>
+    <script src="ethers.umd.js" type="application/javascript"></script>
 </head>
 
 <body>
@@ -169,11 +169,11 @@
     </div>
 
     <script>
-        const contractAddress = "0x5afc6e2ccCFC7Ed3A45532DEfb3a422dA8194955"; // Replace with your contract address
+        const contractAddress = "0x18a2172bCd1351BeDe78382B2F27E92E0cf0A014"; // Replace with your contract address
         let contractABI;
 
         async function loadABI() {
-            const response = await fetch('https://github.com/mrsaeedi93/guttercatgang/blob/75c20af8edcf33ec1b92add30d1e1f574ba7e2a5/ABI.json');
+            const response = await fetch('ABI.json');
             return await response.json();
         }
 
