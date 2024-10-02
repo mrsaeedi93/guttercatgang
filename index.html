@@ -6,7 +6,80 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Based Gutter Cats NFT Mint</title>
     <style>
-        /* Same styling as before */
+        /* Basic styling for gradients, responsive design, and buttons */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ff7e5f, #feb47b);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            text-align: center;
+        }
+
+        h1, h2, p {
+            margin: 0.5em 0;
+        }
+
+        #header {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        #connectButton, #switchNetworkButton, #mintButton {
+            background-color: #ff7e5f;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 1.2em;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #connectButton:hover, #switchNetworkButton:hover, #mintButton:hover {
+            background-color: #feb47b;
+        }
+
+        #contents {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        input[type="number"] {
+            width: 50px;
+            padding: 5px;
+            border-radius: 5px;
+            border: 2px solid #feb47b;
+            font-size: 1.2em;
+            text-align: center;
+        }
+
+        #status {
+            margin-top: 10px;
+            color: #ffeeee;
+            font-size: 0.9em;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            #contents {
+                width: 95%;
+            }
+
+            #connectButton, #switchNetworkButton, #mintButton {
+                font-size: 1em;
+                padding: 8px 15px;
+            }
+        }
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.js" type="application/javascript"></script>
@@ -42,6 +115,11 @@
 
         async function connectToMetaMask() {
             try {
+                if (!window.ethereum) {
+                    alert('MetaMask is not installed. Please install it to use this app.');
+                    return;
+                }
+
                 const provider = new ethers.providers.Web3Provider(window.ethereum);
                 await provider.send("eth_requestAccounts", []);
                 const signer = provider.getSigner();
@@ -63,7 +141,6 @@
 
         async function addBaseSepoliaNetwork() {
             try {
-                // This method adds the Base Sepolia network if it hasn't been added yet
                 await window.ethereum.request({
                     method: 'wallet_addEthereumChain',
                     params: [{
@@ -91,7 +168,6 @@
                 });
             } catch (err) {
                 if (err.code === 4902) {
-                    // Chain has not been added to the user's wallet, prompt to add
                     console.log("Base Sepolia network not found. Attempting to add it.");
                     await addBaseSepoliaNetwork();
                 } else {
