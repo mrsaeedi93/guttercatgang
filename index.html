@@ -235,7 +235,7 @@
             const canBurn = await contract.canBurn(); // Call canBurn function to check if burn is allowed
 
             if (canBurn) {
-                const tx = await contract.burn(); // Burn the NFT if allowed
+                const tx = await contract.burnKitty(); // Burn the NFT if allowed
                 document.getElementById("status").innerText = "Burning in progress...";
                 const receipt = await tx.wait();
                 document.getElementById("status").innerText = `Successfully burned NFT! TxHash: ${receipt.transactionHash}`;
