@@ -36,7 +36,7 @@
         let contractABI;
 
         async function loadABI() {
-            const response = await fetch('ABI.json'); 
+            const response = await fetch('ABI.json');
             return await response.json();
         }
 
@@ -74,8 +74,8 @@
                             symbol: 'ETH',
                             decimals: 18
                         },
-                        rpcUrls: ['https://sepolia.base.org'], // You can replace this with the official RPC URL
-                        blockExplorerUrls: ['https://sepolia.basescan.org'] // Block explorer for Base Sepolia
+                        rpcUrls: ['https://84532.rpc.thirdweb.com/'], // You can replace this with the official RPC URL
+                        blockExplorerUrls: ['https://base-sepolia.blockscout.com/'] // Block explorer for Base Sepolia
                     }]
                 });
             } catch (err) {
