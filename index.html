@@ -11,7 +11,7 @@
             margin: 0;
             padding: 0;
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #ff7e5f, #feb47b);
+            background: linear-gradient(135deg, #1e56e3, #feb47b);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -35,7 +35,8 @@
 
         #connectButton,
         #switchNetworkButton,
-        #mintButton {
+        #mintButton,
+        #burnButton {
             background-color: #ff7e5f;
             border: none;
             padding: 10px 20px;
@@ -48,7 +49,8 @@
 
         #connectButton:hover,
         #switchNetworkButton:hover,
-        #mintButton:hover {
+        #mintButton:hover,
+        #burnButton:hover {
             background-color: #feb47b;
         }
 
@@ -83,14 +85,15 @@
 
             #connectButton,
             #switchNetworkButton,
-            #mintButton {
+            #mintButton,
+            #burnButton {
                 font-size: 1em;
                 padding: 8px 15px;
             }
         }
     </style>
 
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.js" type="application/javascript"></script>
+    <script src="ethers.umd.js" type="application/javascript"></script>
 </head>
 
 <body>
@@ -108,12 +111,14 @@
         <label for="mintAmount">Choose amount to mint (Max 5 per wallet):</label>
         <input type="number" id="mintAmount" min="1" max="5" value="1">
         <button id="mintButton">Mint NFT</button>
+        <button id="burnButton">Burn Kitty</button>
         <div id="mintedCountLabel">Owned NFTs: 0</div>
         <div id="status"></div>
+        <div id="mintsLeftLabel">Mints Left: 0</div> <!-- New label for available mints -->
     </div>
 
     <script>
-        const contractAddress = "0x5afc6e2ccCFC7Ed3A45532DEfb3a422dA8194955"; // Replace with your contract address
+        const contractAddress = "0x18a2172bCd1351BeDe78382B2F27E92E0cf0A014"; // Replace with your contract address
         let contractABI;
 
         async function loadABI() {
@@ -200,14 +205,46 @@
 
         document.getElementById("mintButton").addEventListener("click", mintNFT);
 
+        // Function to check available mints
+        async function checkMintsLeft() {
+            const signer = await connectToMetaMask();
+            if (!signer) return;
+
+            const contract = new ethers.Contract(contractAddress, contractABI, signer);
+            const mintsLeft = await contract.mintsLeft(); // Call mintsLeft function
+            document.getElementById("mintsLeftLabel").innerText = `Mints Left: ${mintsLeft}`;
+        }
+
+        // Call checkMintsLeft on page load
         window.onload = async () => {
             try {
                 contractABI = await loadABI();
+                checkMintsLeft(); // Fetch and display available mints
             } catch (error) {
                 console.error("Failed to load ABI:", error);
                 document.getElementById("status").innerText = "Failed to load ABI.";
             }
         };
+
+        // Function to burn kitty based on canBurn check
+        async function burnKitty() {
+            const signer = await connectToMetaMask();
+            if (!signer) return;
+
+            const contract = new ethers.Contract(contractAddress, contractABI, signer);
+            const canBurn = await contract.canBurn(); // Call canBurn function to check if burn is allowed
+
+            if (canBurn) {
+                const tx = await contract.burn(); // Burn the NFT if allowed
+                document.getElementById("status").innerText = "Burning in progress...";
+                const receipt = await tx.wait();
+                document.getElementById("status").innerText = `Successfully burned NFT! TxHash: ${receipt.transactionHash}`;
+            } else {
+                document.getElementById("status").innerText = "Cannot burn this NFT at the moment.";
+            }
+        }
+
+        document.getElementById("burnButton").addEventListener("click", burnKitty); // Add event listener for burn button
     </script>
 </body>
 
