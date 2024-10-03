@@ -221,7 +221,7 @@
             if (!signer) return;
             const contract = new ethers.Contract(contractAddress, contractABI, signer);
             const address = await signer.getAddress();
-            return contract.getMintsLeft(address);
+            return contract.mintsLeft(address);
         }
 
 
