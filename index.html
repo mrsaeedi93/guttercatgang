@@ -204,7 +204,7 @@
             if (window.ethereum) {
                 try {
                     const acc = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    if (acc.length) 
+                    if (acc.length)
                         return true;
                 } catch (err) {
                     console.log(err);
@@ -402,13 +402,15 @@
                 const receipt = await tx.wait();
                 document.getElementById("status").innerText = `Successfully burned NFT! TxHash: ${receipt.transactionHash}`;
 
-                // Close modal after successful burn
-                modal.style.display = "none";
+
             } catch (err) {
                 console.error(err);
+                document.querySelector("#status").style.color = "yellow";
                 document.getElementById("status").innerText = err.reason || "Error occurred during burning.";
                 document.getElementById("status").classList.add("error");
+
             } finally {
+                modal.style.display = "none";
                 // Reset button text and re-enable button
                 const burnButton = document.getElementById("confirmBurnButton");
                 burnButton.innerHTML = 'Confirm Burn';
