@@ -219,7 +219,10 @@
 
         async function getNFTBalance() {
             const signer = await connectToMetaMask();
-            if (!signer) return;
+            if (!signer) {
+                console.log("func getNFTBalance returned FALSE signer");
+                return;
+            }
             const contract = new ethers.Contract(contractAddress, contractABI, signer);
             const address = await signer.getAddress();
             const balance = await contract.balanceOf(address);
@@ -228,7 +231,10 @@
 
         async function getMintsLeft() {
             const signer = await connectToMetaMask();
-            if (!signer) return;
+            if (!signer) {
+                console.log("func getMintsLeft returned FALSE signer");
+                return;
+            }
             const contract = new ethers.Contract(contractAddress, contractABI, signer);
             const mintsLeft = await contract.mintsLeft();
             return mintsLeft;
@@ -459,14 +465,14 @@
 
             try {
                 if (checkConnection())
-                    document.getElementById("ownedLabel").innerText = getNFTBalance();
+                    document.getElementById("ownedLabel").innerText = await getNFTBalance();
             } catch (err) {
                 document.getElementById("ownedLabel").innerText = "Error fetching owned mints";
             }
 
             try {
                 if (checkConnection())
-                    document.getElementById("mintsLeftLabel").innerText = getMintsLeft();
+                    document.getElementById("mintsLeftLabel").innerText = await getMintsLeft();
             } catch (err) {
                 document.getElementById("mintsLeftLabel").innerText = "Error fetching available mints";
             }
