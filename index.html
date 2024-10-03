@@ -134,9 +134,7 @@
         }
     </style>
 
-    <script type="module">
-        import { ethers } from "./ethers.min.js";
-    </script>
+    <script src="ethers.umd.js" type="application/javascript"></script>
 </head>
 
 <body>
@@ -323,7 +321,7 @@
                 contractABI = await loadABI();
                 await checkBurnStatus(); // Check if burning is allowed
             } catch (error) {
-                console.error(error.error.message);
+                console.error("Failed to load ABI or check burn status:", error.error.message);
                 document.getElementById("status").innerText = "Failed to load ABI or check burn status.";
             }
         };
