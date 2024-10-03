@@ -201,9 +201,15 @@
 
 
         async function checkConnection() {
-            const acc = await ethereum.request({ method: 'eth_accounts' });
-            if (accounts.length)
-                return true;
+            if (window.ethereum) {
+                try {
+                    const acc = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    if (accounts.length)
+                        return true;
+                } catch (err) {
+                    console.log(err);
+                }
+            }
             else
                 return false;
         }
