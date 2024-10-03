@@ -437,19 +437,19 @@
                 // await checkBurnStatus(); // Check if burning is allowed
             } catch (error) {
                 // console.error("Failed to load ABI or check burn status:", error.reason);
-                document.querySelector("status").style.color = "yellow";
+                document.querySelector("#status").style.color = "yellow";
                 document.getElementById("status").innerText = "Failed to load ABI";
             }
 
             try {
-                if (checkConnection)
+                if (checkConnection())
                     document.getElementById("ownedLabel").innerText = getNFTBalance();
             } catch (err) {
                 document.getElementById("ownedLabel").innerText = "Error fetching owned mints";
             }
 
             try {
-                if (checkConnection)
+                if (checkConnection())
                     document.getElementById("mintsLeftLabel").innerText = getMintsLeft();
             } catch (err) {
                 document.getElementById("mintsLeftLabel").innerText = "Error fetching available mints";
