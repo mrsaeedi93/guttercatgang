@@ -321,7 +321,7 @@
                 contractABI = await loadABI();
                 await checkBurnStatus(); // Check if burning is allowed
             } catch (error) {
-                console.error("Failed to load ABI or check burn status:", error.error.message);
+                console.error(error.error.message);
                 document.getElementById("status").innerText = "Failed to load ABI or check burn status.";
             }
         };
