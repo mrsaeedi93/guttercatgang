@@ -177,10 +177,12 @@
         <input type="number" id="mintAmount" min="1" max="5" value="1">
         <button id="mintButton">Mint NFT</button>
         <button id="burnButton">Burn Kitty</button>
-        <div id="mintedCountLabel">Owned NFTs: 0</div>
-        <div id="status"></div>
+        <div id="ownedLabel">Owned NFTs: 0</div>
         <div id="mintsLeftLabel">Mints Left: 0</div> <!-- New label for available mints -->
+        <div id="status"></div>
     </div>
+
+
 
     <!-- Modal for burning NFT -->
     <div id="modal">
@@ -193,6 +195,7 @@
     </div>
 
     <script>
+
         const contractAddress = "0x18a2172bCd1351BeDe78382B2F27E92E0cf0A014"; // Replace with your contract address
         let contractABI;
 
@@ -204,7 +207,7 @@
         async function connectToMetaMask() {
             try {
                 if (!window.ethereum) {
-                    alert('MetaMask is not installed. Please install it to use this app.');
+                    alert('Could not detect Ethereum wallet, Please install a wallet to continue.');
                     return;
                 }
 
@@ -327,52 +330,52 @@
         };
 
         // Burn NFT after confirming NFT ID
-    async function burnKitty() {
-        const signer = await connectToMetaMask();
-        if (!signer) return;
+        async function burnKitty() {
+            const signer = await connectToMetaMask();
+            if (!signer) return;
 
-        const nftId = document.getElementById("nftId").value; // Get NFT ID from input
-        const contract = new ethers.Contract(contractAddress, contractABI, signer);
+            const nftId = document.getElementById("nftId").value; // Get NFT ID from input
+            const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
-        try {
-            // Check if burning is allowed
-            const canBurn = await contract.canBurn();
-            if (!canBurn) {
-                document.getElementById("status").innerText = "Burning is not allowed.";
+            try {
+                // Check if burning is allowed
+                const canBurn = await contract.canBurn();
+                if (!canBurn) {
+                    document.getElementById("status").innerText = "Burning is not allowed.";
+                    document.getElementById("status").classList.add("error");
+                    return;
+                }
+
+                if (!nftId) {
+                    alert("Please enter an NFT ID.");
+                    return;
+                }
+
+                // Show spinner and disable button
+                const burnButton = document.getElementById("confirmBurnButton");
+                burnButton.innerHTML = 'Burning <span class="spinner"></span>';
+                burnButton.disabled = true;
+
+                const tx = await contract.burnKitty(nftId);
+                document.getElementById("status").innerText = "Burning in progress...";
+                document.getElementById("status").classList.remove("error");
+
+                const receipt = await tx.wait();
+                document.getElementById("status").innerText = `Successfully burned NFT! TxHash: ${receipt.transactionHash}`;
+
+                // Close modal after successful burn
+                modal.style.display = "none";
+            } catch (err) {
+                console.error(err);
+                document.getElementById("status").innerText = err.reason || "Error occurred during burning.";
                 document.getElementById("status").classList.add("error");
-                return;
+            } finally {
+                // Reset button text and re-enable button
+                const burnButton = document.getElementById("confirmBurnButton");
+                burnButton.innerHTML = 'Confirm Burn';
+                burnButton.disabled = false;
             }
-
-            if (!nftId) {
-                alert("Please enter an NFT ID.");
-                return;
-            }
-
-            // Show spinner and disable button
-            const burnButton = document.getElementById("confirmBurnButton");
-            burnButton.innerHTML = 'Burning <span class="spinner"></span>';
-            burnButton.disabled = true;
-
-            const tx = await contract.burnKitty(nftId);
-            document.getElementById("status").innerText = "Burning in progress...";
-            document.getElementById("status").classList.remove("error");
-
-            const receipt = await tx.wait();
-            document.getElementById("status").innerText = `Successfully burned NFT! TxHash: ${receipt.transactionHash}`;
-
-            // Close modal after successful burn
-            modal.style.display = "none";
-        } catch (err) {
-            console.error(err);
-            document.getElementById("status").innerText = err.reason || "Error occurred during burning.";
-            document.getElementById("status").classList.add("error");
-        } finally {
-            // Reset button text and re-enable button
-            const burnButton = document.getElementById("confirmBurnButton");
-            burnButton.innerHTML = 'Confirm Burn';
-            burnButton.disabled = false;
         }
-    }
 
 
 
@@ -389,14 +392,39 @@
 
         document.getElementById("confirmBurnButton").addEventListener("click", burnKitty);
 
+
         // Load ABI and check burn status on page load
         window.onload = async () => {
+            try {
+                if (!window.ethereum) {
+                    document.querySelector("#status").style.color = "yellow";
+                    document.getElementById("status").innerText = "Could not detect Ethereum wallet, Please install a wallet to continue";
+                }
+            } catch (err) {
+                console.log("Failed to check Ethereum wallet");
+            }
+
             try {
                 contractABI = await loadABI();
                 // await checkBurnStatus(); // Check if burning is allowed
             } catch (error) {
                 // console.error("Failed to load ABI or check burn status:", error.reason);
+                document.querySelector("status").style.color = "yellow";
                 document.getElementById("status").innerText = "Failed to load ABI";
+            }
+
+            try {
+                const ownedNFTs = await contract.balanceOf();
+                document.getElementById("ownedLabel").innerText = ownedNFTs;
+            } catch (err) {
+                document.getElementById("ownedLabel").innerText = "Error fetching owned mints";
+            }
+
+            try {
+                const mintsLeft = await contract.mintsLeft();
+                document.getElementById("mintsLeftLabel").innerText = mintsLeft;
+            } catch (err) {
+                document.getElementById("mintsLeftLabel").innerText = "Error fetching available mints";
             }
         };
     </script>
