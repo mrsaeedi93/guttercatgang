@@ -431,10 +431,17 @@
 
             if (window.ethereum) {
                 if (checkConnection()) {
+                    const provider = new ethers.providers.Web3Provider(window.ethereum);
+                    await provider.send("eth_requestAccounts", []);
+                    const signer = provider.getSigner();
+                    const address = await signer.getAddress();
+                    const network = await provider.getNetwork();
+
                     document.getElementById("walletAddress").style.display = "inline";
-                    //document.getElementById("walletAddress").innerText = `Connected: ${address}`;
+                    document.getElementById("walletAddress").innerText = `Connected: ${address}`;
                     document.getElementById("connectButton").style.display = "none";
-                    //document.getElementById("switchNetworkButton").style.display = network.chainId !== 84532 ? "inline" : "none";
+                    document.getElementById("switchNetworkButton").style.display = network.chainId !== 84532 ? "inline" : "none";
+
                 }
                 else console.log("checkConnection returned FALSE");
             }
