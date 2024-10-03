@@ -114,6 +114,34 @@
             color: black;
         }
 
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #fff;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Status error text styling */
+        .error {
+            color: red;
+        }
+
+
+
         /* Mobile responsiveness */
         @media (max-width: 768px) {
             #contents {
@@ -299,36 +327,52 @@
         };
 
         // Burn NFT after confirming NFT ID
-        async function burnKitty() {
-            const signer = await connectToMetaMask();
-            if (!signer) return;
+    async function burnKitty() {
+        const signer = await connectToMetaMask();
+        if (!signer) return;
 
-            const nftId = document.getElementById("nftId").value; // Get NFT ID from input
-            const contract = new ethers.Contract(contractAddress, contractABI, signer);
+        const nftId = document.getElementById("nftId").value; // Get NFT ID from input
+        const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
-            try {
-                const canBurn = await contract.canBurn();
-                if (!nftId) {
-                    alert("Please enter an NFT ID.");
-                    return;
-                }
-
-                const tx = await contract.burnKitty(nftId);
-                document.getElementById("status").innerText = "Burning in progress...";
-                const receipt = await tx.wait();
-                document.getElementById("status").innerText = `Successfully burned NFT! TxHash: ${receipt.transactionHash}`;
-
-                modal.style.display = "none"; // Close modal after burn attempt
-
+        try {
+            // Check if burning is allowed
+            const canBurn = await contract.canBurn();
+            if (!canBurn) {
+                document.getElementById("status").innerText = "Burning is not allowed.";
+                document.getElementById("status").classList.add("error");
+                return;
             }
 
-            catch (err) {
-                console.log(err.reason);
-                document.getElementById("status").innerText = err.reason;
-
+            if (!nftId) {
+                alert("Please enter an NFT ID.");
+                return;
             }
+
+            // Show spinner and disable button
+            const burnButton = document.getElementById("confirmBurnButton");
+            burnButton.innerHTML = 'Burning <span class="spinner"></span>';
+            burnButton.disabled = true;
+
+            const tx = await contract.burnKitty(nftId);
+            document.getElementById("status").innerText = "Burning in progress...";
+            document.getElementById("status").classList.remove("error");
+
+            const receipt = await tx.wait();
+            document.getElementById("status").innerText = `Successfully burned NFT! TxHash: ${receipt.transactionHash}`;
+
+            // Close modal after successful burn
+            modal.style.display = "none";
+        } catch (err) {
+            console.error(err);
+            document.getElementById("status").innerText = err.reason || "Error occurred during burning.";
+            document.getElementById("status").classList.add("error");
+        } finally {
+            // Reset button text and re-enable button
+            const burnButton = document.getElementById("confirmBurnButton");
+            burnButton.innerHTML = 'Confirm Burn';
+            burnButton.disabled = false;
         }
-
+    }
 
 
 
