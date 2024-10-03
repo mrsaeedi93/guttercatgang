@@ -206,7 +206,10 @@
                     const acc = await window.ethereum.request({ method: 'eth_requestAccounts' });
                     console.log(acc);
                     if (acc.length)
+                    {
+                        console.log("Returning True in checkWalletConnection Now..");
                         return true;
+                    }
                 } catch (err) {
                     console.log(err);
                 }
