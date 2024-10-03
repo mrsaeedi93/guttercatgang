@@ -205,8 +205,7 @@
                 try {
                     const acc = await window.ethereum.request({ method: 'eth_requestAccounts' });
                     console.log(acc);
-                    if (acc.length)
-                    {
+                    if (acc.length) {
                         console.log("Returning True in checkWalletConnection Now..");
                         return true;
                     }
@@ -429,16 +428,17 @@
                 console.log("Failed to check Ethereum wallet");
             }
 
-            try {
-                if (window.ethereum && checkConnection()) {
+
+            if (window.ethereum) {
+                if (checkConnection()) {
                     document.getElementById("walletAddress").style.display = "inline";
                     document.getElementById("walletAddress").innerText = `Connected: ${address}`;
                     document.getElementById("connectButton").style.display = "none";
                     document.getElementById("switchNetworkButton").style.display = network.chainId !== 84532 ? "inline" : "none";
                 }
-            } catch (err) {
-                console.log("failed to check wallet connection")
+                else console.log("checkConnection returned FALSE");
             }
+            else console.log("window.ethereum returned FALSE");
 
 
             try {
