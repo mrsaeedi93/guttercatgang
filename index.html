@@ -260,8 +260,6 @@
             const contract = new ethers.Contract(contractAddress, contractABI, signer);
             const canBurn = await contract.canBurn(); // Check burn status from contract
 
-            const burnButton = document.getElementById("burnButton");
-
         }
 
         // Show modal to get NFT ID
@@ -290,8 +288,7 @@
             const nftId = document.getElementById("nftId").value; // Get NFT ID from input
             const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
-            try
-            {
+            try {
                 const canBurn = await contract.canBurn();
                 if (!nftId) {
                     alert("Please enter an NFT ID.");
@@ -308,6 +305,7 @@
             }
 
             catch (err) {
+                console.log(err.reason);
                 document.getElementById("status").innerText = err.reason;
 
             }
