@@ -266,8 +266,26 @@
         const modal = document.getElementById("modal");
         const closeModal = document.getElementById("closeModal");
 
-        document.getElementById("burnButton").addEventListener("click", () => {
-            modal.style.display = "block";
+        document.getElementById("burnButton").addEventListener("click", async () => {
+            const signer = await connectToMetaMask();
+            if (!signer) return;
+
+            const contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+            try {
+                // Check if the burn action is allowed
+                const canBurn = await contract.canBurn();
+
+                if (canBurn) {
+                    // If canBurn is true, show the modal
+                    modal.style.display = "block";
+                } else {
+                    document.getElementById("status").innerText = "Burning is not allowed.";
+                }
+            } catch (err) {
+                console.error("Error checking burn status:", err);
+                document.getElementById("status").innerText = err.reason;
+            }
         });
 
         closeModal.onclick = function () {
