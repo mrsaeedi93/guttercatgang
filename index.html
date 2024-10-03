@@ -177,8 +177,8 @@
         <input type="number" id="mintAmount" min="1" max="5" value="1">
         <button id="mintButton">Mint NFT</button>
         <button id="burnButton">Burn Kitty</button>
-        <div id="ownedLabel">Owned NFTs: 0</div>
-        <div id="mintsLeftLabel">Mints Left: 0</div> <!-- New label for available mints -->
+        <div id="ownedLabel"></div>
+        <div id="mintsLeftLabel"></div> <!-- New label for available mints -->
         <div id="status"></div>
     </div>
 
@@ -198,6 +198,32 @@
 
         const contractAddress = "0x18a2172bCd1351BeDe78382B2F27E92E0cf0A014"; // Replace with your contract address
         let contractABI;
+
+
+        async function checkConnection() {
+            const acc = await ethereum.request({ method: 'eth_accounts' });
+            if (accounts.length)
+                return true;
+            else
+                return false;
+        }
+
+        async function getNFTBalance() {
+            const signer = await connectToMetaMask();
+            if (!signer) return;
+            const contract = new ethers.Contract(contractAddress, contractABI, signer);
+            const address = await signer.getAddress();
+            return contract.balanceOf(address);
+        }
+
+        async function getMintsLeft() {
+            const signer = await connectToMetaMask();
+            if (!signer) return;
+            const contract = new ethers.Contract(contractAddress, contractABI, signer);
+            const address = await signer.getAddress();
+            return contract.getMintsLeft(address);
+        }
+
 
         async function loadABI() {
             const response = await fetch('ABI.json');
@@ -378,18 +404,6 @@
         }
 
 
-
-
-
-        //    if (canBurn) {
-        //        const tx = await contract.burnKitty(nftId);
-        //        document.getElementById("status").innerText = "Burning in progress...";
-        //        const receipt = await tx.wait();
-        //        document.getElementById("status").innerText = `Successfully burned NFT! TxHash: ${receipt.transactionHash}`;
-
-        //        modal.style.display = "none"; // Close modal after burn attempt
-        //}
-
         document.getElementById("confirmBurnButton").addEventListener("click", burnKitty);
 
 
@@ -405,6 +419,18 @@
             }
 
             try {
+                if (window.ethereum && checkConnection) {
+                    document.getElementById("walletAddress").style.display = "inline";
+                    document.getElementById("walletAddress").innerText = `Connected: ${address}`;
+                    document.getElementById("connectButton").style.display = "none";
+                    document.getElementById("switchNetworkButton").style.display = network.chainId !== 84532 ? "inline" : "none";
+                }
+            } catch (err) {
+                console.log("failed to check wallet connection")
+            }
+
+
+            try {
                 contractABI = await loadABI();
                 // await checkBurnStatus(); // Check if burning is allowed
             } catch (error) {
@@ -414,15 +440,15 @@
             }
 
             try {
-                const ownedNFTs = await contract.balanceOf();
-                document.getElementById("ownedLabel").innerText = ownedNFTs;
+                if (checkConnection)
+                    document.getElementById("ownedLabel").innerText = getNFTBalance();
             } catch (err) {
                 document.getElementById("ownedLabel").innerText = "Error fetching owned mints";
             }
 
             try {
-                const mintsLeft = await contract.mintsLeft();
-                document.getElementById("mintsLeftLabel").innerText = mintsLeft;
+                if (checkConnection)
+                    document.getElementById("mintsLeftLabel").innerText = getMintsLeft();
             } catch (err) {
                 document.getElementById("mintsLeftLabel").innerText = "Error fetching available mints";
             }
