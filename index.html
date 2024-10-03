@@ -419,7 +419,7 @@
             }
 
             try {
-                if (window.ethereum && checkConnection) {
+                if (window.ethereum && checkConnection()) {
                     document.getElementById("walletAddress").style.display = "inline";
                     document.getElementById("walletAddress").innerText = `Connected: ${address}`;
                     document.getElementById("connectButton").style.display = "none";
