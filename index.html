@@ -48,6 +48,7 @@
         }
 
         #connectButton:hover,
+        #burnButton:hover,
         #switchNetworkButton:hover,
         #mintButton:hover {
             background-color: #feb47b;
@@ -309,8 +310,12 @@
 
             const tx = await contract.mint(mintAmount, { value: totalPrice });
             document.getElementById("status").innerText = "Minting in progress...";
+            document.getElementById("mintButton").disabled = true;
+            document.getElementById("burnButton").disabled = true;
             const receipt = await tx.wait();
             document.getElementById("status").innerText = `Successfully minted ${mintAmount} NFTs! TxHash: ${receipt.transactionHash}`;
+            document.getElementById("mintButton").disabled = false;
+            document.getElementById("burnButton").disabled = false;
         }
 
         document.getElementById("mintButton").addEventListener("click", mintNFT);
