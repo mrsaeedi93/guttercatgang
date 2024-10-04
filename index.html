@@ -332,6 +332,8 @@
             document.getElementById("status").innerText = `Successfully minted ${mintAmount} NFTs! TxHash: ${receipt.transactionHash}`;
             document.getElementById("mintButton").disabled = false;
             document.getElementById("burnButton").disabled = false;
+            document.getElementById("ownedLabel").innerText = "Owned NFTs: " + await getNFTBalance();
+            document.getElementById("mintsLeftLabel").innerText = "Mints Left: " + await getMintsLeft();
         }
 
         document.getElementById("mintButton").addEventListener("click", mintNFT);
@@ -409,12 +411,15 @@
                 burnButton.innerHTML = 'Burning <span class="spinner"></span>';
                 burnButton.disabled = true;
 
+                
                 const tx = await contract.burnKitty(nftId);
                 document.getElementById("status").innerText = "Burning in progress...";
                 document.getElementById("status").classList.remove("error");
 
                 const receipt = await tx.wait();
                 document.getElementById("status").innerText = `Successfully burned NFT! TxHash: ${receipt.transactionHash}`;
+                document.getElementById("ownedLabel").innerText = "Owned NFTs: " + await getNFTBalance();
+                document.getElementById("mintsLeftLabel").innerText = "Mints Left: " + await getMintsLeft();
 
 
             } catch (err) {
