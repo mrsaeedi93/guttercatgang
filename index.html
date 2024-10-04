@@ -153,20 +153,15 @@
                 padding: 8px 15px;
             }
 
-            #mintbutton:disabled {
-                border: 1px solid #999999;
-                background-color: #cccccc;
-                color: #666666;
-                cursor: not-allowed;
-            }
 
             button:disabled,
+            #mintbutton:disabled,
             input[type="button"]:disabled,
             button[disabled] {
-                border: 1px solid #999999;
-                background-color: #cccccc;
-                color: #666666;
-                cursor: not-allowed;
+                border: 1px solid #999999 !important;
+                background-color: #cccccc !important;
+                color: #666666 !important;
+                cursor: not-allowed !important;
             }
         }
     </style>
@@ -188,7 +183,7 @@
         <p>First NFT mint for each wallet is <b><i>Free!</i></b></p>
         <label for="mintAmount">Choose amount to mint (Max 5 per wallet):</label>
         <input type="number" id="mintAmount" min="1" max="5" value="1">
-        <button id="mintButton" disabled="true" [disabled]="true">Mint NFT</button>
+        <button id="mintButton">Mint NFT</button>
         <button id="burnButton">Burn Kitty</button>
         <div id="ownedLabel"></div>
         <div id="mintsLeftLabel"></div> <!-- New label for available mints -->
@@ -320,6 +315,7 @@
         });
 
         async function mintNFT() {
+            console.log("Mint BTN Click!");
             const signer = await connectToMetaMask();
             if (!signer) return;
 
