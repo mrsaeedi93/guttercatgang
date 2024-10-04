@@ -7,6 +7,15 @@
     <title>Based Gutter Cats NFT Mint</title>
     <style>
         /* Basic styling for gradients, responsive design, and buttons */
+
+        button:disabled {
+            border: 1px solid #999999 !important;
+            background-color: #cccccc !important;
+            color: #666666 !important;
+            cursor: not-allowed !important;
+        }
+
+
         body {
             margin: 0;
             padding: 0;
@@ -154,15 +163,7 @@
             }
 
 
-            button:disabled,
-            #mintbutton:disabled,
-            input[type="button"]:disabled,
-            button[disabled] {
-                border: 1px solid #999999 !important;
-                background-color: #cccccc !important;
-                color: #666666 !important;
-                cursor: not-allowed !important;
-            }
+
         }
     </style>
 
@@ -315,7 +316,6 @@
         });
 
         async function mintNFT() {
-            console.log("Mint BTN Click!");
             const signer = await connectToMetaMask();
             if (!signer) return;
 
@@ -324,9 +324,10 @@
             const totalPrice = await contract.mintPrice(mintAmount);
 
             const tx = await contract.mint(mintAmount, { value: totalPrice });
-            document.getElementById("status").innerText = "Minting in progress...";
             document.getElementById("mintButton").disabled = true;
             document.getElementById("burnButton").disabled = true;
+            document.getElementById("status").innerText = "Minting in progress...";
+
             const receipt = await tx.wait();
             document.getElementById("status").innerText = `Successfully minted ${mintAmount} NFTs! TxHash: ${receipt.transactionHash}`;
             document.getElementById("mintButton").disabled = false;
