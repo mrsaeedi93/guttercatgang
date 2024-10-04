@@ -73,7 +73,7 @@
 
         #status {
             margin-top: 10px;
-            color: #ffeeee;
+            color: yellow;
             font-size: 0.9em;
         }
 
@@ -134,13 +134,6 @@
                 transform: rotate(360deg);
             }
         }
-
-        /* Status error text styling */
-        .error {
-            color: red;
-        }
-
-
 
         /* Mobile responsiveness */
         @media (max-width: 768px) {
@@ -405,7 +398,7 @@
 
             } catch (err) {
                 console.error(err);
-                document.querySelector("#status").style.color = "yellow";
+
                 document.getElementById("status").innerText = err.reason || "Error occurred during burning.";
                 document.getElementById("status").classList.add("error");
 
@@ -426,7 +419,7 @@
         window.onload = async () => {
             try {
                 if (!window.ethereum) {
-                    document.querySelector("#status").style.color = "yellow";
+
                     document.getElementById("status").innerText = "Could not detect Ethereum wallet, Please install a wallet to continue";
                 }
             } catch (err) {
@@ -458,7 +451,7 @@
                 // await checkBurnStatus(); // Check if burning is allowed
             } catch (error) {
                 // console.error("Failed to load ABI or check burn status:", error.reason);
-                document.querySelector("#status").style.color = "yellow";
+
                 document.getElementById("status").innerText = "Failed to load ABI";
             }
 
