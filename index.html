@@ -126,12 +126,7 @@
             margin-left: 10px;
         }
 
-        button:disabled,
-        button[disabled] {
-            border: 1px solid #999999;
-            background-color: #cccccc;
-            color: #666666;
-        }
+
 
 
         @keyframes spin {
@@ -157,6 +152,22 @@
                 font-size: 1em;
                 padding: 8px 15px;
             }
+
+            #mintbutton:disabled {
+                border: 1px solid #999999;
+                background-color: #cccccc;
+                color: #666666;
+                cursor: not-allowed;
+            }
+
+            button:disabled,
+            input[type="button"]:disabled,
+            button[disabled] {
+                border: 1px solid #999999;
+                background-color: #cccccc;
+                color: #666666;
+                cursor: not-allowed;
+            }
         }
     </style>
 
@@ -177,7 +188,7 @@
         <p>First NFT mint for each wallet is <b><i>Free!</i></b></p>
         <label for="mintAmount">Choose amount to mint (Max 5 per wallet):</label>
         <input type="number" id="mintAmount" min="1" max="5" value="1">
-        <button id="mintButton">Mint NFT</button>
+        <button id="mintButton" disabled="true" [disabled]="true">Mint NFT</button>
         <button id="burnButton">Burn Kitty</button>
         <div id="ownedLabel"></div>
         <div id="mintsLeftLabel"></div> <!-- New label for available mints -->
